@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Scientific Calculator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --btn: #007bff;
+      --btn-hover: #0056b3;
+      --equal: #28a745;
+      --equal-hover: #1e7e34;
+      --clear: #dc3545;
+      --clear-hover: #a71d2a;
+    }
+    body.dark {
+      --bg: #121212;
+      --text: #ffffff;
+      --btn: #333;
+      --btn-hover: #444;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+      transition: 0.3s ease;
+    }
+    .calculator {
+      background: var(--bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .calculator h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #result {
+      width: 100%;
+      height: 50px;
+      font-size: 22px;
+      text-align: right;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--btn);
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: var(--btn-hover);
+    }
+    .equal {
+      background-color: var(--equal);
+    }
+    .equal:hover {
+      background-color: var(--equal-hover);
+    }
+    .clear {
+      background-color: var(--clear);
+    }
+    .clear:hover {
+      background-color: var(--clear-hover);
+    }
+    @media (max-width: 500px) {
+      button {
+        padding: 12px;
+        font-size: 14px;
+      }
+      #result {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="top-bar">
+      <div class="switch">
+        <label><input type="checkbox" id="degRadSwitch" checked onchange="toggleMode()"> Deg</label>
+        <label><input type="checkbox" id="themeToggle" onchange="toggleTheme()"> Dark</label>
+      </div>
+    </div>
+    <h2>Scientific Calculator</h2>
+    <input type="text" id="result" readonly />
+    <div class="buttons">
+      <button onclick="clearResult()" class="clear">C</button>
+      <button onclick="append('(')">(</button>
+      <button onclick="append(')')">)</button>
+      <button onclick="append('Math.PI')">π</button>
+      <button onclick="append('Math.E')">e</button>
+
+      <button onclick="appendTrig('sin')">sin</button>
+      <button onclick="appendTrig('cos')">cos</button>
+      <button onclick="appendTrig('tan')">tan</button>
+      <button onclick="append('Math.log10(')">log</button>
+      <button onclick="append('Math.log(')">ln</button>
+
+      <button onclick="append('Math.asin(')">asin</button>
+      <button onclick="append('Math.acos(')">acos</button>
+      <button onclick="append('Math.atan(')">atan</button>
+      <button onclick="append('Math.sqrt(')">√</button>
+      <button onclick="append('**0.5')">x^0.5</button>
+
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('/')">/</button>
+      <button onclick="append('**2')">x²</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('*')">*</button>
+      <button onclick="append('**')">x^y</button>
+
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('-')">-</button>
+      <button onclick="append('.')">.</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('+')">+</button>
+      <button onclick="append('%')">%</button>
+      <button onclick="append('factorial(')">x!</button>
+      <button onclick="calculate()" class="equal">=</button>
+    </div>
+  </div>
+
+  <script>
+    let isDegrees = true;
+
+    function toggleMode() {
+      isDegrees = document.getElementById('degRadSwitch').checked;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    function append(val) {
+      document.getElementById("result").value += val;
+    }
+
+    function clearResult() {
+      document.getElementById("result").value = '';
+    }
+
+    function appendTrig(func) {
+      document.getElementById("result").value += func + '(';
+    }
+
+    function factorial(n) {
+      if (n === 0 || n === 1) return 1;
+      let res = 1;
+      for (let i = 2; i <= n; i++) res *= i;
+      return res;
+    }
+
+    function calculate() {
+      try {
+        const expr = document.getElementById("result").value;
+
+        const toRad = x => x * Math.PI / 180;
+        const sin = x => isDegrees ? Math.sin(toRad(x)) : Math.sin(x);
+        const cos = x => isDegrees ? Math.cos(toRad(x)) : Math.cos(x);
+        const tan = x => isDegrees ? Math.tan(toRad(x)) : Math.tan(x);
+
+        const result = eval(expr);
+        document.getElementById("result").value = result;
+      } catch (e) {
+        alert("Invalid Expression");
+        clearResult();
+      }
+    }
+  </script>
+</body>
+</html>
